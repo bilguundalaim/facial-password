@@ -6,11 +6,9 @@ import string
 import secrets
 from cryptography.fernet import Fernet
 
-# Initialize face detector and facial landmark predictor
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
-# Generate an encryption key
 key = Fernet.generate_key()
 cipher = Fernet(key)
 
@@ -20,13 +18,11 @@ def get_landmarks_from_frame(frame):
     faces = detector(gray)
     
     if len(faces) == 0:
-        return None, frame  # No face detected
+        return None, frame
     
-    # Use the first detected face
     landmarks = predictor(gray, faces[0])
     points = [(p.x, p.y) for p in landmarks.parts()]
     
-    # Draw the landmarks on the frame
     for (x, y) in points:
         cv2.circle(frame, (x, y), 2, (0, 255, 0), -1)
     

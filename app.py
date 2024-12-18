@@ -37,18 +37,16 @@ def login():
 def capture_landmarks():
     data = request.get_json()
     frame_data = data['frame']
-    frame_data = frame_data.split(',')[1]  # Remove the data URL prefix
+    frame_data = frame_data.split(',')[1]
     frame_bytes = base64.b64decode(frame_data)
     frame_array = np.frombuffer(frame_bytes, dtype=np.uint8)
     frame = cv2.imdecode(frame_array, cv2.IMREAD_COLOR)
 
-    # Extract landmarks and draw them on the frame
     landmarks, frame_with_landmarks = get_landmarks_from_frame(frame)
     if landmarks:
         normalized_landmarks = normalize_landmarks(landmarks)
         password = generate_password(normalized_landmarks, length=16)
         
-        # Encode the frame with landmarks back to base64
         _, buffer = cv2.imencode('.png', frame_with_landmarks)
         frame_with_landmarks_base64 = base64.b64encode(buffer).decode('utf-8')
         

@@ -94,7 +94,6 @@
         <p>&copy; 2023 Landmark Capture. All rights reserved.</p>
     </footer>
     <script>
-        // Access the webcam
         const video = document.getElementById('video');
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
@@ -105,10 +104,8 @@
             });
 
         document.getElementById('captureButton').addEventListener('click', function() {
-            // Show loading indicator
             document.getElementById('loading').style.display = 'block';
 
-            // Capture a frame from the video
             const canvas = document.createElement('canvas');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -116,7 +113,6 @@
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const frame = canvas.toDataURL('image/png');
 
-            // Send the frame to the server for landmark extraction
             fetch('/capture_landmarks', {
                 method: 'POST',
                 headers: {
@@ -126,7 +122,6 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Hide loading indicator
                 document.getElementById('loading').style.display = 'none';
 
                 if (data.generated_password) {
