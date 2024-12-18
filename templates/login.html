@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landmark Capture</title>
+    <title>Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,6 +27,17 @@
             padding: 20px;
         }
 
+        form {
+            display: inline-block;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -41,21 +52,20 @@
         button:hover {
             background-color: #0056b3;
         }
-
-        p {
-            margin-top: 20px;
-            font-size: 18px;
-        }
     </style>
 </head>
 <body>
     <header>
-        <h1>Landmark Capture</h1>
+        <h1>Login</h1>
     </header>
     <main>
-        <p>Welcome to Landmark Capture. Please register or login to continue.</p>
-        <a href="/register"><button>Register</button></a>
-        <a href="/login"><button>Login</button></a>
+        <form action="/login" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
     </main>
     <footer>
         <p>&copy; 2023 Landmark Capture. All rights reserved.</p>

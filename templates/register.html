@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header, footer {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+        }
+
+        header h1, footer p {
+            margin: 0;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        form {
+            display: inline-block;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        video {
+            margin-top: 20px;
+            width: 640px;
+            height: 480px;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        #result {
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Register</h1>
+    </header>
+    <main>
+        <form id="registerForm" action="/register" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="text" id="password" name="password" readonly required>
+            <button type="button" id="captureButton">Capture Landmarks</button>
+            <button type="submit">Register</button>
+        </form>
+        <video id="video" autoplay></video>
+        <div id="loading">Processing...</div>
+        <p id="result"></p>
+        <img id="landmarkImage" src="" alt="Landmark Image">
+    </main>
+    <footer>
+        <p>&copy; 2023 Landmark Capture. All rights reserved.</p>
+    </footer>
+    <script>
+        // Access the webcam
+        const video = document.getElementById('video');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing the webcam: " + err);
+            });
+
+        document.getElementById('captureButton').addEventListener('click', function() {
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+
+            // Capture a frame from the video
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const frame = canvas.toDataURL('image/png');
+
+            // Send the frame to the server for landmark extraction
+            fetch('/capture_landmarks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ frame: frame })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading indicator
+                document.getElementById('loading').style.display = 'none';
+
+                if (data.generated_password) {
+                    document.getElementById('password').value = data.generated_password;
+                    document.getElementById('result').innerText = 'Generated Password: ' + data.generated_password;
+                    document.getElementById('landmarkImage').src = data.frame_with_landmarks;
+                } else {
+                    document.getElementById('result').innerText = 'Error: ' + data.error;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

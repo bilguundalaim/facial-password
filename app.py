@@ -1,14 +1,37 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for
 import cv2
 import numpy as np
 import base64
 from main import get_landmarks_from_frame, normalize_landmarks, generate_password
+from database import init_db, add_user, get_user
 
 app = Flask(__name__)
+init_db()
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        add_user(username, password)
+        return redirect(url_for('login'))
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user = get_user(username)
+        if user and user[1] == password:
+            return f"Login successful for username: {username}"
+        else:
+            return "Invalid username or password. Please try again."
+    return render_template('login.html')
 
 @app.route('/capture_landmarks', methods=['POST'])
 def capture_landmarks():
